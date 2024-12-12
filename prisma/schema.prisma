@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  name     String
+  lastname String?
+  email    String
+
+  movies MovieUser[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Director {
+  id       Int     @id @default(autoincrement())
+  name     String
+  lastname String?
+  age      Int
+  movies   Movie[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Actor {
+  id       Int     @id @default(autoincrement())
+  name     String
+  lastname String?
+
+  movies MovieActor[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Movie {
+  id          Int      @id @default(autoincrement())
+  title       String
+  duration    Int
+  language    String
+  director_id Int
+  director    Director @relation(fields: [director_id], references: [id])
+
+  users  MovieUser[]
+  actors MovieActor[]
+  genres MovieGenre[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model MovieUser {
+  movie_id Int
+  movie    Movie @relation(fields: [movie_id], references: [id])
+
+  user_id Int
+  user    User @relation(fields: [user_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@id([movie_id, user_id])
+}
+
+model MovieActor {
+  movie_id Int
+  movie    Movie @relation(fields: [movie_id], references: [id])
+
+  actor_id Int
+  actor    Actor @relation(fields: [actor_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@id([movie_id, actor_id])
+}
+
+model Genre {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  movies MovieGenre[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model MovieGenre {
+  movie_id Int
+  movie    Movie @relation(fields: [movie_id], references: [id])
+
+  genre_id Int
+  genre    Genre @relation(fields: [genre_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@id([movie_id, genre_id])
+}
